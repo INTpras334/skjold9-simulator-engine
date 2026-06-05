@@ -1,6 +1,8 @@
 numpy>=1.24
 scipy>=1.10
 matplotlib>=3.7
-astropy>=5.0
-poliastro>=0.17
-jupyterlab
+fastapi>=0.100
+uvicorn[standard]>=0.22
+
+# Optional: Desktop UI (legacy)
+# dearpygui>=1.9

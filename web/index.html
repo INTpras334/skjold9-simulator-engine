@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Skjold-9: Simulasi interaktif ancaman asteroid dengan visualisasi orbit real-time, analisis Monte Carlo, dan deteksi anomali gravitasi.">
+  <meta name="keywords" content="asteroid, simulasi, orbit, Monte Carlo, ancaman, ruang angkasa, Skjold-9">
+  <meta name="author" content="Skjold-9 Team">
+  <meta name="theme-color" content="#0a0a1a">
+  <meta property="og:title" content="Skjold-9 | Simulasi Interaktif Ancaman Asteroid">
+  <meta property="og:description" content="Visualisasi orbit asteroid real-time dengan analisis Monte Carlo dan deteksi anomali gravitasi.">
+  <meta property="og:type" content="website">
+  <title>Skjold-9 | Simulasi Interaktif Ancaman Asteroid</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Starfield layers -->
+  <div class="starfield" aria-hidden="true"></div>
+  <div class="starfield starfield--layer2" aria-hidden="true"></div>
+
+  <header id="app-header">
+    <div class="header-content">
+      <div class="logo-group">
+        <div class="logo-icon" aria-hidden="true">
+          <svg viewBox="0 0 40 40" width="40" height="40">
+            <circle cx="20" cy="20" r="8" fill="none" stroke="#6c63ff" stroke-width="1.5" opacity="0.5"/>
+            <circle cx="20" cy="20" r="14" fill="none" stroke="#6c63ff" stroke-width="1" opacity="0.3"/>
+            <circle cx="20" cy="20" r="4" fill="#6c63ff"/>
+            <circle cx="20" cy="20" r="2" fill="#fff"/>
+            <line x1="8" y1="8" x2="32" y2="32" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="2,3" opacity="0.6"/>
+            <circle cx="30" cy="12" r="3" fill="#ff6b6b" opacity="0.8"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1 class="logo-title">SKJOLD-9</h1>
+          <p class="logo-subtitle">Asteroid Threat Simulator</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-reset-camera" class="btn-icon" title="Reset Kamera" aria-label="Reset kamera orbit">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+          </svg>
+        </button>
+        <div class="mode-indicator" id="mode-indicator">
+          <span class="mode-dot"></span>
+          <span class="mode-label">TRAJECTORY</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="app-main">
+    <!-- ============ CONTROL PANEL (left sidebar) ============ -->
+    <aside id="control-panel">
+      <div class="panel-scroll">
+
+        <!-- Asteroid Parameters -->
+        <section class="control-section">
+          <h2 class="section-title">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4m0 14v4M4.22 4.22l2.83 2.83m9.9 9.9l2.83 2.83M1 12h4m14 0h4M4.22 19.78l2.83-2.83m9.9-9.9l2.83-2.83"/></svg>
+            Parameter Asteroid
+          </h2>
+
+          <div class="slider-group">
+            <label for="slider-rx">Posisi X</label>
+            <div class="slider-wrapper">
+              <input type="range" id="slider-rx" min="-3" max="3" value="-1.2" step="0.01">
+              <span class="slider-value" id="value-rx">-1.20</span>
+              <span class="slider-unit">AU</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label for="slider-ry">Posisi Y</label>
+            <div class="slider-wrapper">
+              <input type="range" id="slider-ry" min="-3" max="3" value="0.5" step="0.01">
+              <span class="slider-value" id="value-ry">0.50</span>
+              <span class="slider-unit">AU</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label for="slider-vx">Kecepatan X</label>
+            <div class="slider-wrapper">
+              <input type="range" id="slider-vx" min="-50" max="50" value="18.0" step="0.1">
+              <span class="slider-value" id="value-vx">18.0</span>
+              <span class="slider-unit">km/s</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label for="slider-vy">Kecepatan Y</label>
+            <div class="slider-wrapper">
+              <input type="range" id="slider-vy" min="-50" max="50" value="-4.5" step="0.1">
+              <span class="slider-value" id="value-vy">-4.5</span>
+              <span class="slider-unit">km/s</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Anomaly Section -->
+        <section class="control-section">
+          <h2 class="section-title">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Anomali
+          </h2>
+
+          <div class="toggle-group">
+            <span class="toggle-label">Gravitasi Anomali</span>
+            <label class="toggle-switch" for="toggle-anomaly">
+              <input type="checkbox" id="toggle-anomaly">
+              <span class="toggle-track">
+                <span class="toggle-thumb"></span>
+              </span>
+            </label>
+          </div>
+
+          <div class="slider-group" id="anomaly-strength-group">
+            <label for="slider-anomaly-strength">Kekuatan</label>
+            <div class="slider-wrapper">
+              <input type="range" id="slider-anomaly-strength" min="0.1" max="10" value="1.0" step="0.1">
+              <span class="slider-value" id="value-anomaly-strength">1.0</span>
+              <span class="slider-unit">×10⁻⁷ m/s²</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Monte Carlo Section -->
+        <section class="control-section">
+          <h2 class="section-title">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M8 8h.01M12 12h.01M16 8h.01M8 16h.01M16 16h.01"/></svg>
+            Monte Carlo
+          </h2>
+
+          <div class="slider-group">
+            <label for="slider-nsims">Jumlah Simulasi</label>
+            <div class="slider-wrapper">
+              <input type="range" id="slider-nsims" min="10" max="500" value="100" step="10">
+              <span class="slider-value" id="value-nsims">100</span>
+              <span class="slider-unit">runs</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label for="slider-sigma-pos">σ Posisi</label>
+            <div class="slider-wrapper">
+              <input type="range" id="slider-sigma-pos" min="0.001" max="0.1" value="0.001" step="0.001">
+              <span class="slider-value" id="value-sigma-pos">0.001</span>
+              <span class="slider-unit">AU</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label for="slider-sigma-vel">σ Kecepatan</label>
+            <div class="slider-wrapper">
+              <input type="range" id="slider-sigma-vel" min="1" max="500" value="10" step="1">
+              <span class="slider-value" id="value-sigma-vel">10</span>
+              <span class="slider-unit">m/s</span>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button id="btn-monte-carlo" class="btn btn-primary">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+              <span>JALANKAN MONTE CARLO</span>
+            </button>
+            <button id="btn-anomaly-compare" class="btn btn-secondary">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/><path d="m15 9 6-6"/></svg>
+              <span>BANDINGKAN ANOMALI</span>
+            </button>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-container" id="progress-container">
+            <div class="progress-header">
+              <span class="progress-label">Simulasi berjalan...</span>
+              <span class="progress-count" id="progress-count">0 / 100</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-impacts" id="progress-impacts">Impact terdeteksi: 0</div>
+          </div>
+        </section>
+      </div>
+    </aside>
+
+    <!-- ============ VISUALIZATION AREA ============ -->
+    <div id="visualization-area">
+      <!-- Orbit Canvas -->
+      <div id="orbit-container">
+        <canvas id="orbit-canvas"></canvas>
+        <div id="orbit-overlay">
+          <div class="overlay-item" id="overlay-zoom">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <span id="overlay-zoom-value">1.0×</span>
+          </div>
+          <div class="overlay-item" id="overlay-coords">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+            <span id="overlay-coords-value">0.00, 0.00 AU</span>
+          </div>
+          <div class="overlay-item" id="overlay-time" style="display:none;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="overlay-time-value">T+0 days</span>
+          </div>
+        </div>
+        <!-- Loading overlay -->
+        <div class="canvas-loading" id="canvas-loading">
+          <div class="loading-spinner"></div>
+          <span>Menghitung orbit...</span>
+        </div>
+      </div>
+
+      <!-- Results Panel -->
+      <div id="results-panel">
+        <!-- Impact Gauge -->
+        <div class="result-card result-card--gauge" id="impact-gauge-card">
+          <h3 class="result-title">Probabilitas Impact</h3>
+          <div class="gauge-container" id="impact-gauge">
+            <svg class="gauge-svg" viewBox="0 0 200 120">
+              <defs>
+                <linearGradient id="gauge-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#4ecdc4"/>
+                  <stop offset="50%" stop-color="#ffd93d"/>
+                  <stop offset="100%" stop-color="#ff6b6b"/>
+                </linearGradient>
+              </defs>
+              <!-- Background arc -->
+              <path class="gauge-bg" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="12" stroke-linecap="round"/>
+              <!-- Value arc -->
+              <path class="gauge-fill" id="gauge-fill" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gauge-gradient)" stroke-width="12" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="251.33"/>
+              <!-- Needle -->
+              <line id="gauge-needle" x1="100" y1="100" x2="100" y2="28" stroke="#e0e0ff" stroke-width="2" stroke-linecap="round" transform="rotate(-90, 100, 100)"/>
+              <circle cx="100" cy="100" r="5" fill="#6c63ff"/>
+              <circle cx="100" cy="100" r="2.5" fill="#fff"/>
+            </svg>
+            <div class="gauge-value-container">
+              <span class="gauge-value" id="gauge-value">0.0</span>
+              <span class="gauge-percent">%</span>
+            </div>
+            <div class="gauge-status" id="gauge-status">
+              <span class="status-badge status-safe" id="status-badge">AMAN</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="result-card result-card--stats" id="stats-cards">
+          <div class="stat-card" id="stat-distance">
+            <div class="stat-icon stat-icon--distance">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="stat-distance-value">—</span>
+              <span class="stat-label">Jarak Minimum</span>
+              <span class="stat-sublabel" id="stat-distance-au"></span>
+            </div>
+          </div>
+
+          <div class="stat-card" id="stat-energy">
+            <div class="stat-icon stat-icon--energy">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="stat-energy-value">—</span>
+              <span class="stat-label">Energi Orbital</span>
+              <span class="stat-sublabel">J/kg</span>
+            </div>
+          </div>
+
+          <div class="stat-card" id="stat-status">
+            <div class="stat-icon stat-icon--status">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number stat-status-text" id="stat-status-value">—</span>
+              <span class="stat-label">Status Ancaman</span>
+              <span class="stat-sublabel" id="stat-status-detail"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Histogram -->
+        <div class="result-card result-card--chart" id="histogram-card" style="display:none;">
+          <h3 class="result-title">Distribusi Jarak Minimum</h3>
+          <div class="histogram-container" id="histogram-container">
+            <div class="histogram-chart" id="histogram-chart"></div>
+            <div class="histogram-axis">
+              <span>0</span>
+              <span id="histogram-mid-label">—</span>
+              <span id="histogram-max-label">— km</span>
+            </div>
+          </div>
+          <div class="histogram-summary" id="histogram-summary"></div>
+        </div>
+
+        <!-- Deviation Chart -->
+        <div class="result-card result-card--chart" id="deviation-card" style="display:none;">
+          <h3 class="result-title">Deviasi Anomali vs Waktu</h3>
+          <div class="deviation-container" id="deviation-container">
+            <svg id="deviation-svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <linearGradient id="deviation-fill-grad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#ff6b6b" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#ff6b6b" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- Threshold line -->
+              <line id="deviation-threshold" x1="0" y1="0" x2="600" y2="0" stroke="#ff6b6b" stroke-width="1" stroke-dasharray="6,4" opacity="0.6"/>
+              <text id="deviation-threshold-label" x="605" y="4" fill="#ff6b6b" font-size="10" font-family="Inter">10,000 km</text>
+              <!-- Area fill -->
+              <polygon id="deviation-area" points="" fill="url(#deviation-fill-grad)"/>
+              <!-- Line -->
+              <polyline id="deviation-line" points="" fill="none" stroke="#ff6b6b" stroke-width="2"/>
+              <!-- Axis labels -->
+              <text x="300" y="198" fill="#8888aa" font-size="10" text-anchor="middle" font-family="Inter">Waktu (hari)</text>
+            </svg>
+          </div>
+          <div class="deviation-summary" id="deviation-summary"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer id="app-footer">
+    <div class="footer-content">
+      <span class="footer-credit">SKJOLD-9 Simulator &middot; Orbital Mechanics Engine</span>
+      <span class="footer-badge footer-badge--wip">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        Story Mode — Coming Soon
+      </span>
+    </div>
+  </footer>
+
+  <script src="js/api-client.js" defer></script>
+  <script src="js/orbit-renderer.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>

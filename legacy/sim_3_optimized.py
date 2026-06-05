@@ -3,13 +3,8 @@ sim_3_optimized.py
 Simulasi Monte Carlo Ultra-Cepat dengan Early Stopping & Multi-Processing.
 """
 
-import os
-import sys
-os.environ['TCL_LIBRARY'] = r'D:\laragon\bin\python\python-3.13\tcl\tcl8.6'
-os.environ['TK_LIBRARY'] = r'D:\laragon\bin\python\python-3.13\tcl\tk8.6'
-
 import matplotlib
-matplotlib.use('TkAgg')
+matplotlib.use('Agg')
 
 import numpy as np
 from scipy.integrate import solve_ivp

@@ -6,13 +6,8 @@ Membandingkan dua set parameter:
   - Set B: parameter yang lebih akurat (setelah koreksi data)
 """
 
-import os
-import sys
-os.environ['TCL_LIBRARY'] = r'D:\laragon\bin\python\python-3.13\tcl\tcl8.6'
-os.environ['TK_LIBRARY'] = r'D:\laragon\bin\python\python-3.13\tcl\tk8.6'
-
 import matplotlib
-matplotlib.use('TkAgg')  # Kembalikan ke TkAgg karena Tcl/Tk sudah diperbaiki
+matplotlib.use('Agg')
 
 import numpy as np
 from scipy.integrate import solve_ivp

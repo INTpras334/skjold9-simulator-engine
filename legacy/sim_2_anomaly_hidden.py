@@ -3,13 +3,8 @@ sim_2_anomaly_hidden.py
 Simulasi anomali tersembunyi menggunakan modul utils.py.
 """
 
-import os
-import sys
-os.environ['TCL_LIBRARY'] = r'D:\laragon\bin\python\python-3.13\tcl\tcl8.6'
-os.environ['TK_LIBRARY'] = r'D:\laragon\bin\python\python-3.13\tcl\tk8.6'
-
 import matplotlib
-matplotlib.use('Agg')  # Gunakan 'TkAgg' jika Tcl/Tk sudah diperbaiki
+matplotlib.use('Agg')
 
 import numpy as np
 from scipy.integrate import solve_ivp
