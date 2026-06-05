@@ -1,10 +1,10 @@
 import os
-import sys
 
-# Perbaikan Path Tcl/Tk untuk Python Laragon
+# Copy-paste 2 baris ini di paling atas file sim_2_anomaly_hidden.py kamu
 os.environ['TCL_LIBRARY'] = r'D:\laragon\bin\python\python-3.13\tcl\tcl8.6'
 os.environ['TK_LIBRARY'] = r'D:\laragon\bin\python\python-3.13\tcl\tk8.6'
 
+# Sisa kode import bawaanmu ke bawah...
 import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
